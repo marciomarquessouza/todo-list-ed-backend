@@ -3,13 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Put,
   Query,
-  Req,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -23,6 +23,7 @@ import { TasksService } from './tasks.service';
 
 @Controller('tasks')
 export class TasksController {
+  private logger = new Logger('#Task:');
   constructor(private taskService: TasksService) {}
 
   @Get()
@@ -47,6 +48,11 @@ export class TasksController {
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: IUser,
   ): Promise<TaskEntity> {
+    this.logger.verbose(
+      `User '${user.email}' creating a new task: ${JSON.stringify(
+        createTaskDto,
+      )}`,
+    );
     return this.taskService.createTask(createTaskDto, user);
   }
 
@@ -66,6 +72,9 @@ export class TasksController {
     @Param('status', TaskStatusPipe) status: TaskStatus,
     @GetUser() user: IUser,
   ): Promise<TaskEntity> {
+    this.logger.verbose(
+      `User '${user.email}' updating task with id '${id}' to '${status}'`,
+    );
     return await this.taskService.updateTaskStatus(id, status, user);
   }
 
@@ -74,6 +83,7 @@ export class TasksController {
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: IUser,
   ): Promise<void> {
+    this.logger.verbose(`User '${user.email}' deleting task with id '${id}'`);
     await this.taskService.deleteTask(id, user);
   }
 }

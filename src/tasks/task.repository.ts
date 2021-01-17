@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common';
 import { UserEntity } from 'src/auth/user.entity';
 import { ProjectEntity } from 'src/projects/projects.entity';
 import { EntityRepository, Repository } from 'typeorm';
@@ -7,6 +8,8 @@ import { TaskStatus } from './tasks.interface';
 
 @EntityRepository(TaskEntity)
 export class TaskRepository extends Repository<TaskEntity> {
+  private logger = new Logger('#Task Repository');
+
   async createTask(
     createTaskDto: CreateTaskDto,
     user: UserEntity,
@@ -23,11 +26,17 @@ export class TaskRepository extends Repository<TaskEntity> {
     task.project = project;
     task.user = user;
 
-    await task.save();
-
-    delete task.user;
-
-    return task;
+    try {
+      await task.save();
+      delete task.user;
+      return task;
+    } catch (error) {
+      this.logger.error(
+        `Error to create a new challenge. Data: ${JSON.stringify(
+          createTaskDto,
+        )}. Error: ${error.message}`,
+      );
+    }
   }
 
   async getTasks(

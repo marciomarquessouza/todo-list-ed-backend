@@ -1,3 +1,4 @@
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { UserEntity } from 'src/auth/user.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateProjectDto, FilterProjectDto } from './dto';
@@ -5,6 +6,8 @@ import { ProjectEntity } from './projects.entity';
 
 @EntityRepository(ProjectEntity)
 export class ProjectRepository extends Repository<ProjectEntity> {
+  private logger = new Logger('#Task Repository');
+
   async createProject(
     createProjectDto: CreateProjectDto,
     user: UserEntity,
@@ -16,11 +19,17 @@ export class ProjectRepository extends Repository<ProjectEntity> {
     project.createdAt = new Date();
     project.tasks = [];
     project.user = user;
-    await project.save();
-
-    delete project.user;
-
-    return project;
+    try {
+      await project.save();
+      delete project.user;
+      return project;
+    } catch (error) {
+      this.logger.error(
+        `Error to create a new challenge. Data: ${JSON.stringify(
+          createProjectDto,
+        )}. Error: ${error.message}`,
+      );
+    }
   }
 
   async getProjects(
@@ -44,8 +53,11 @@ export class ProjectRepository extends Repository<ProjectEntity> {
       query.limit(limit);
     }
 
-    const projects = await query.getMany();
-
-    return projects;
+    try {
+      const projects = await query.getMany();
+      return projects;
+    } catch (error) {
+      throw new InternalServerErrorException(`Occurred an unexpect error`);
+    }
   }
 }

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   ParseIntPipe,
   Post,
@@ -19,6 +20,8 @@ import { ProjectsService } from './projects.service';
 
 @Controller('projects')
 export class ProjectsController {
+  private logger = new Logger('#Task:');
+
   constructor(private projectService: ProjectsService) {}
 
   @Get()
@@ -43,6 +46,11 @@ export class ProjectsController {
     @Body() createProjectDto: CreateProjectDto,
     @GetUser() user: IUser,
   ): Promise<ProjectEntity> {
+    this.logger.verbose(
+      `User '${user.email}' creating a new project: ${JSON.stringify(
+        createProjectDto,
+      )}`,
+    );
     return await this.projectService.createProject(createProjectDto, user);
   }
 
@@ -61,6 +69,9 @@ export class ProjectsController {
     @Param('id', ParseIntPipe) id: number,
     @GetUser() user: IUser,
   ): Promise<void> {
+    this.logger.verbose(
+      `User '${user.email}' deleting a project with with id '${id}'`,
+    );
     await this.projectService.deleteProject(id, user);
   }
 }
