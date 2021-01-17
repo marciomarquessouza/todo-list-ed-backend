@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { IsEmail } from 'class-validator';
 import {
   BaseEntity,
@@ -25,4 +26,9 @@ export class UserEntity extends BaseEntity {
 
   @Column()
   salt: string;
+
+  async validatePassword(password: string): Promise<boolean> {
+    const hash = await bcrypt.hash(password, this.salt);
+    return hash === this.password;
+  }
 }

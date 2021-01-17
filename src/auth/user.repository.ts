@@ -6,6 +6,7 @@ import { EntityRepository, Repository } from 'typeorm';
 import { UserEntity } from './auth.entity';
 import { SignUpCredentialsDto } from './dto/auth-signup.dto';
 import * as bcrypt from 'bcrypt';
+import { SignInCredentialsDto } from './dto/auth-signin.dto';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
@@ -35,5 +36,16 @@ export class UserRepository extends Repository<UserEntity> {
     salt: string,
   ): Promise<string> {
     return await bcrypt.hash(password, salt);
+  }
+
+  async validatePassword(signInDto: SignInCredentialsDto): Promise<string> {
+    const { email, password } = signInDto;
+    const user = await this.findOne({ email });
+    const isValid = await user.validatePassword(password);
+    if (isValid) {
+      return email;
+    }
+
+    return null;
   }
 }
