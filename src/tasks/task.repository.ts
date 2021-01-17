@@ -1,4 +1,5 @@
 import { UserEntity } from 'src/auth/user.entity';
+import { ProjectEntity } from 'src/projects/projects.entity';
 import { EntityRepository, Repository } from 'typeorm';
 import { CreateTaskDto, FilterTaskDto } from './dto';
 import { TaskEntity } from './tasks.entity';
@@ -9,6 +10,7 @@ export class TaskRepository extends Repository<TaskEntity> {
   async createTask(
     createTaskDto: CreateTaskDto,
     user: UserEntity,
+    project: ProjectEntity,
   ): Promise<TaskEntity> {
     const { title, description } = createTaskDto;
 
@@ -18,7 +20,9 @@ export class TaskRepository extends Repository<TaskEntity> {
     task.description = description;
     task.createdAt = new Date();
     task.status = TaskStatus.OPEN;
+    task.project = project;
     task.user = user;
+
     await task.save();
 
     delete task.user;
@@ -30,7 +34,7 @@ export class TaskRepository extends Repository<TaskEntity> {
     filterTaskDto: FilterTaskDto,
     userId: number,
   ): Promise<TaskEntity[]> {
-    const { status, search, limit } = filterTaskDto;
+    const { status, search, limit, project } = filterTaskDto;
 
     const query = this.createQueryBuilder('task');
 
@@ -45,6 +49,10 @@ export class TaskRepository extends Repository<TaskEntity> {
         'task.title LIKE :search OR task.description LIKE :search',
         { search: `%${search}%` },
       );
+    }
+
+    if (project) {
+      query.andWhere('task.projectId = :project', { project });
     }
 
     if (limit) {

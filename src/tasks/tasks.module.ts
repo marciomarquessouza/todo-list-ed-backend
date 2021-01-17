@@ -7,12 +7,19 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthMiddleware } from 'src/auth/auth.middleware';
 import { UserRepository } from 'src/auth/user.repository';
+import { ProjectRepository } from 'src/projects/project.repository';
 import { TaskRepository } from './task.repository';
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TaskRepository, UserRepository])],
+  imports: [
+    TypeOrmModule.forFeature([
+      TaskRepository,
+      UserRepository,
+      ProjectRepository,
+    ]),
+  ],
   controllers: [TasksController],
   providers: [TasksService],
 })

@@ -6,12 +6,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './tasks.entity';
 import { IUser } from 'src/auth/user.interface';
 import { UserRepository } from 'src/auth/user.repository';
+import { ProjectRepository } from 'src/projects/project.repository';
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectRepository(TaskRepository) private taskRepository: TaskRepository,
     @InjectRepository(UserRepository) private userRepository: UserRepository,
+    @InjectRepository(ProjectRepository)
+    private projectRepository: ProjectRepository,
   ) {}
 
   async getTasks(
@@ -38,10 +41,24 @@ export class TasksService {
 
   async createTask(
     createTaskDto: CreateTaskDto,
-    { id }: IUser,
+    { id: userId }: IUser,
   ): Promise<TaskEntity> {
-    const user = await this.userRepository.findOne(id);
-    return await this.taskRepository.createTask(createTaskDto, user);
+    const { projectId } = createTaskDto;
+    const user = await this.userRepository.findOne(userId);
+
+    if (!user) {
+      throw new NotFoundException(`User with id '${userId}' not found`);
+    }
+
+    const project = await this.projectRepository.findOne(projectId);
+
+    if (!project) {
+      throw new NotFoundException(
+        `Project with id '${projectId}' was not found`,
+      );
+    }
+
+    return await this.taskRepository.createTask(createTaskDto, user, project);
   }
 
   async updateTask(
