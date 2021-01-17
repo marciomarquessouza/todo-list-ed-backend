@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { UserEntity } from 'src/auth/user.entity';
 import { ProjectEntity } from 'src/projects/projects.entity';
 import { EntityRepository, Repository } from 'typeorm';
@@ -68,8 +68,11 @@ export class TaskRepository extends Repository<TaskEntity> {
       query.limit(limit);
     }
 
-    const tasks = await query.getMany();
-
-    return tasks;
+    try {
+      const tasks = await query.getMany();
+      return tasks;
+    } catch (error) {
+      throw new InternalServerErrorException(`Occurred an unexpect error`);
+    }
   }
 }
