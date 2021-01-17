@@ -1,17 +1,17 @@
 import { UserEntity } from 'src/auth/user.entity';
-import { ProjectEntity } from 'src/projects/projects.entity';
+import { TaskEntity } from 'src/tasks/tasks.entity';
 import {
   BaseEntity,
   BeforeUpdate,
   Column,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { TaskStatus } from './tasks.interface';
 
-@Entity('task')
-export class TaskEntity extends BaseEntity {
+@Entity('project')
+export class ProjectEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -21,40 +21,28 @@ export class TaskEntity extends BaseEntity {
   @Column()
   description: string;
 
-  @Column()
-  status: TaskStatus;
-
   @Column({ type: 'timestamp' })
   createdAt: Date;
-
-  @Column({ type: 'date', nullable: true })
-  startedAt?: Date;
-
-  @Column({ type: 'date', nullable: true })
-  finishedAt?: Date;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated: Date;
 
   @ManyToOne(
     type => UserEntity,
-    user => user.tasks,
+    user => user.projects,
     { eager: false },
   )
   user: UserEntity;
 
-  @ManyToOne(
-    type => ProjectEntity,
-    project => project.tasks,
-    { eager: false },
-  )
-  project: ProjectEntity;
-
   @Column()
   userId: number;
 
-  @Column()
-  projectId: number;
+  @OneToMany(
+    type => TaskEntity,
+    task => task.project,
+    { eager: true },
+  )
+  tasks: TaskEntity[];
 
   @BeforeUpdate()
   updateTimestamp() {

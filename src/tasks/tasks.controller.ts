@@ -51,6 +51,7 @@ export class TasksController {
   }
 
   @Put('/:id')
+  @UsePipes(ValidationPipe)
   async updateTask(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,

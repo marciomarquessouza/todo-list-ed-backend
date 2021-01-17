@@ -1,5 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { IsEmail } from 'class-validator';
+import { ProjectEntity } from 'src/projects/projects.entity';
 import { TaskEntity } from 'src/tasks/tasks.entity';
 import {
   BaseEntity,
@@ -35,6 +36,12 @@ export class UserEntity extends BaseEntity {
     { eager: true },
   )
   tasks: TaskEntity[];
+
+  @OneToMany(
+    type => ProjectEntity,
+    project => project.user,
+  )
+  projects: ProjectEntity[];
 
   async validatePassword(password: string): Promise<boolean> {
     const hash = await bcrypt.hash(password, this.salt);
