@@ -1,12 +1,13 @@
 import {
   ConflictException,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
-import { UserEntity } from './auth.entity';
+import { UserEntity } from './user.entity';
 import { SignUpCredentialsDto } from './dto/auth-signup.dto';
 import * as bcrypt from 'bcrypt';
-import { SignInCredentialsDto } from './dto/auth-signin.dto';
+import { SignInCredentialsDto } from './dto';
 
 @EntityRepository(UserEntity)
 export class UserRepository extends Repository<UserEntity> {
@@ -41,6 +42,11 @@ export class UserRepository extends Repository<UserEntity> {
   async validatePassword(signInDto: SignInCredentialsDto): Promise<string> {
     const { email, password } = signInDto;
     const user = await this.findOne({ email });
+
+    if (!user) {
+      throw new UnauthorizedException('Rejected Credentials');
+    }
+
     const isValid = await user.validatePassword(password);
     if (isValid) {
       return email;

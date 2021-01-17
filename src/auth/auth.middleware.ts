@@ -3,15 +3,11 @@ import {
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
-import { NextFunction, Request } from 'express';
+import { NextFunction } from 'express';
 import { jwtConfig } from '../config/jwt.config';
-import { IUser } from './user.interface';
+import { IUser, IRequest } from './user.interface';
 
 const jwt = require('jsonwebtoken');
-
-interface IRequest extends Request {
-  user: IUser;
-}
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

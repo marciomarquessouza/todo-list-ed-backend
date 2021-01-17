@@ -1,8 +1,10 @@
+import { UserEntity } from 'src/auth/user.entity';
 import {
   BaseEntity,
   BeforeUpdate,
   Column,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TaskStatus } from './tasks.interface';
@@ -32,6 +34,16 @@ export class TaskEntity extends BaseEntity {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updated: Date;
+
+  @ManyToOne(
+    type => UserEntity,
+    user => user.tasks,
+    { eager: false },
+  )
+  user: UserEntity;
+
+  @Column()
+  userId: number;
 
   @BeforeUpdate()
   updateTimestamp() {
