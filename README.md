@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://imgur.com/epvJB2c" width="320" alt="Nest Logo" />
+  <img src="https://i.imgur.com/epvJB2c.png" width="320" alt="Nest Logo" />
 </p>
 
 ## Description
