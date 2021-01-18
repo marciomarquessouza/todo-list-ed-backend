@@ -3,10 +3,6 @@ export class CreateTaskDto {
   @IsNotEmpty()
   title: string;
 
-  @IsOptional()
-  @IsNotEmpty()
-  description: string;
-
   @IsNotEmpty()
   projectId: number;
 }

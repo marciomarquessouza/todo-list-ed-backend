@@ -19,9 +19,6 @@ export class TaskEntity extends BaseEntity {
   title: string;
 
   @Column()
-  description: string;
-
-  @Column()
   status: TaskStatus;
 
   @Column({ type: 'timestamp' })

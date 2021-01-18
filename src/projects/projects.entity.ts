@@ -18,9 +18,6 @@ export class ProjectEntity extends BaseEntity {
   @Column()
   title: string;
 
-  @Column()
-  description: string;
-
   @Column({ type: 'timestamp' })
   createdAt: Date;
 

@@ -55,10 +55,9 @@ export class ProjectsService {
     updateProjectDto: UpdateProjectDto,
     user: IUser,
   ): Promise<ProjectEntity> {
-    const { title, description } = updateProjectDto;
+    const { title } = updateProjectDto;
     const project = await this.getProjectById(id, user);
     project.title = title;
-    project.description = description;
     await project.save();
     return project;
   }

@@ -15,12 +15,11 @@ export class TaskRepository extends Repository<TaskEntity> {
     user: UserEntity,
     project: ProjectEntity,
   ): Promise<TaskEntity> {
-    const { title, description } = createTaskDto;
+    const { title } = createTaskDto;
 
     const task = new TaskEntity();
 
     task.title = title;
-    task.description = description;
     task.createdAt = new Date();
     task.status = TaskStatus.OPEN;
     task.project = project;
@@ -32,7 +31,7 @@ export class TaskRepository extends Repository<TaskEntity> {
       return task;
     } catch (error) {
       this.logger.error(
-        `Error to create a new challenge. Data: ${JSON.stringify(
+        `Error to create a new task. Data: ${JSON.stringify(
           createTaskDto,
         )}. Error: ${error.message}`,
       );
@@ -54,10 +53,7 @@ export class TaskRepository extends Repository<TaskEntity> {
     }
 
     if (search) {
-      query.andWhere(
-        'task.title LIKE :search OR task.description LIKE :search',
-        { search: `%${search}%` },
-      );
+      query.andWhere('task.title LIKE :search', { search: `%${search}%` });
     }
 
     if (project) {

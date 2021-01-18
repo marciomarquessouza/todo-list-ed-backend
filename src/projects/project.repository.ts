@@ -6,16 +6,15 @@ import { ProjectEntity } from './projects.entity';
 
 @EntityRepository(ProjectEntity)
 export class ProjectRepository extends Repository<ProjectEntity> {
-  private logger = new Logger('#Task Repository');
+  private logger = new Logger('#Project Repository');
 
   async createProject(
     createProjectDto: CreateProjectDto,
     user: UserEntity,
   ): Promise<ProjectEntity> {
-    const { title, description } = createProjectDto;
+    const { title } = createProjectDto;
     const project = new ProjectEntity();
     project.title = title;
-    project.description = description;
     project.createdAt = new Date();
     project.tasks = [];
     project.user = user;
@@ -25,7 +24,7 @@ export class ProjectRepository extends Repository<ProjectEntity> {
       return project;
     } catch (error) {
       this.logger.error(
-        `Error to create a new challenge. Data: ${JSON.stringify(
+        `Error to create a new project. Data: ${JSON.stringify(
           createProjectDto,
         )}. Error: ${error.message}`,
       );
@@ -43,10 +42,7 @@ export class ProjectRepository extends Repository<ProjectEntity> {
     query.where('project.userId = :userId', { userId });
 
     if (search) {
-      query.andWhere(
-        'project.title LIKE :search OR project.description LIKE :search',
-        { search: `%${search}%` },
-      );
+      query.andWhere('project.title LIKE :search', { search: `%${search}%` });
     }
 
     if (limit) {

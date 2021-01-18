@@ -66,10 +66,9 @@ export class TasksService {
     updateTaskDto: UpdateTaskDto,
     user: IUser,
   ): Promise<TaskEntity> {
-    const { title, description } = updateTaskDto;
+    const { title } = updateTaskDto;
     const task = await this.getTaskById(id, user);
-    task.title = title || task.title;
-    task.description = description || task.description;
+    task.title = title;
     await task.save();
     return task;
   }
